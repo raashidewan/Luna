@@ -1,0 +1,52 @@
+package org.firstinspires.ftc.teamcode.sensor_methods;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+/**
+ * Created by Raashi Dewan on 7/4/2017.
+ */
+
+@Autonomous(name = "Gyro Test", group = "Sensors")
+public class gyro extends LinearOpMode{
+    public void runOpMode(){
+        ModernRoboticsI2cGyro gyro;   // Hardware Device Object
+        int xVal, yVal, zVal = 0;     // Gyro rate Values
+        int heading = 0;
+        // The heading value of the gryo, where all angles are measured from the angle from where it was set to 0
+        int angleZ = 0;
+        boolean lastResetState = false;
+        boolean curResetState  = false;
+
+        // get a reference to a Modern Robotics GyroSensor object.
+        gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
+
+        // start calibrating the gyro.
+        telemetry.addData(">", "Gyro Calibrating. Do Not move!");
+        telemetry.update();
+        gyro.calibrate();
+
+        // make sure the gyro is calibrated.
+//        while (!isStopRequested() && gyro.isCalibrating())  {
+//            sleep(50);
+//            idle();
+//        }
+
+
+        if(!gyro.isCalibrating()) {
+            telemetry.addData(">", "Gyro Calibrated.  Press Start.");
+            telemetry.update();
+        }
+
+        waitForStart();
+
+        while(opModeIsActive()){
+            angleZ = gyro.getIntegratedZValue();
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.update();
+        }
+    }
+}

@@ -1,0 +1,46 @@
+package org.firstinspires.ftc.teamcode.sensor_methods;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsAnalogOpticalDistanceSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsDigitalTouchSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.readingToFileV2;
+
+
+/**
+ * Created by Raashi Dewan on 8/10/2017.
+ */
+
+@Autonomous(name = "ODS Test", group = "Sensors")
+public class ods2 extends LinearOpMode{
+    public ModernRoboticsAnalogOpticalDistanceSensor ods = null;
+    public ModernRoboticsDigitalTouchSensor touch = null;
+    public readingToFileV2 dataLogger;
+
+    public void runOpMode(){
+        ods = (ModernRoboticsAnalogOpticalDistanceSensor)hardwareMap.opticalDistanceSensor.get("ods");
+        touch = (ModernRoboticsDigitalTouchSensor)hardwareMap.touchSensor.get("touch");
+        boolean logData = true;
+
+        waitForStart();
+        if(logData){
+            dataLogger = new readingToFileV2("ods");
+            dataLogger.addField("Normal");
+            dataLogger.addField("Raw");
+            dataLogger.newLine();
+        }
+
+        while(opModeIsActive()){
+            telemetry.addData("Raw:", ods.getRawLightDetected());
+            telemetry.addData("Normal: ", ods.getLightDetected());
+            telemetry.update();
+            if(touch.getValue() == 1){
+                dataLogger.addField(ods.getLightDetected());
+                dataLogger.addField(ods.getRawLightDetected());
+                dataLogger.newLine();
+            }
+
+        }
+    }
+}

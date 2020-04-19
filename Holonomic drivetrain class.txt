@@ -1,0 +1,194 @@
+package org.firstinspires.ftc.teamcode;
+
+import org.firstinspires.ftc.teamcode.Hardware;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+/**
+ * Created by Raashi Dewan on 8/13/2017.
+ */
+
+public class drivetrain extends Hardware{
+
+    Hardware robot = new Hardware();
+    double frontLastEncoder;
+    double backLastEncoder;
+    double leftLastEncoder;
+    double rightLastEncoder;
+
+    ElapsedTime runtime = new ElapsedTime();
+
+    public drivetrain(HardwareMap hardwareMap){
+        robot.init(hardwareMap);
+    }
+
+    /* Sets power to all wheel motors
+    Inputs: double speed
+    int direction: 0 = forward, 1 = backward, 2 = left, 3 = right
+     */
+    public void setPower(double speed, int direction){
+        if(direction == 0){
+            //forwards
+            robot.front.setPower(0);
+            robot.back.setPower(0);
+            robot.right.setPower(speed);
+            robot.left.setPower(speed);
+        }
+        else if(direction == 1){
+            //backwards
+            robot.front.setPower(0);
+            robot.back.setPower(0);
+            robot.right.setPower(-speed);
+            robot.left.setPower(-speed);
+        }
+        else if(direction == 2){
+            //left
+            robot.front.setPower(-speed);
+            robot.back.setPower(-speed);
+            robot.right.setPower(0);
+            robot.left.setPower(0);
+        }
+        else if(direction == 3){
+            //right
+            robot.front.setPower(speed);
+            robot.back.setPower(speed);
+            robot.right.setPower(0);
+            robot.left.setPower(0);
+        }
+    }
+
+    /*
+    Inputs: speed
+    int direction: 0 = left, 1 = right
+     */
+    public void pivot(double speed, int direction){
+        if(direction == 0){
+            //left
+            robot.front.setPower(speed);
+            robot.back.setPower(-speed);
+            robot.right.setPower(speed);
+            robot.left.setPower(-speed);
+        }
+        else if(direction == 1){
+            //right
+            robot.front.setPower(-speed);
+            robot.back.setPower(speed);
+            robot.right.setPower(-speed);
+            robot.left.setPower(speed);
+        }
+        this.stopMotors();
+    }
+
+    public void resetEncoders(){
+        robot.front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        frontLastEncoder = robot.front.getCurrentPosition();
+        backLastEncoder = robot.back.getCurrentPosition();
+        leftLastEncoder = robot.left.getCurrentPosition();
+        rightLastEncoder = robot.right.getCurrentPosition();
+    }
+
+    /* Drive with encoders
+    Inputs: distance in inches, direction of movement, speed
+     */
+    public void driveDistance(double distance, int direction, double speed){
+
+        if(direction == 0){
+            //forwards
+            while(averageEncoderValue2() < distance){
+                this.setPower(speed, 0);
+            }
+        }
+        else if(direction == 1){
+            //backwards
+            while(averageEncoderValue2() < distance){
+                this.setPower(speed, 1);
+            }
+        }
+        else if(direction == 2){
+            //left
+            while(averageEncoderValue1() < distance){
+                this.setPower(speed, 2);
+            }
+        }
+        else if(direction == 3){
+            //right
+            while(averageEncoderValue1() < distance){
+                this.setPower(speed, 3);
+            }
+        }
+        this.stopMotors();
+    }
+
+    public double[] getEncoderValues(){
+        double[] encoders = {robot.front.getCurrentPosition() - frontLastEncoder, robot.back.getCurrentPosition() - backLastEncoder,
+                robot.left.getCurrentPosition() - leftLastEncoder, robot.right.getCurrentPosition() - rightLastEncoder};
+        return encoders;
+    }
+
+    public double averageEncoderValue1(){
+        double[] encoders = this.getEncoderValues();
+        double average = Math.abs((encoders[0] + encoders[1]) / 2);
+        //need positive values
+        return average;
+    }
+
+    public double averageEncoderValue2(){
+        double[] encoders = this.getEncoderValues();
+        double average = Math.abs((encoders[2] + encoders[3]) / 2);
+        //need positive values
+        return average;
+    }
+
+    //time in seconds
+    public void driveByTime(double speed, int direction, double time){
+        runtime.reset();
+        while ((runtime.seconds() < time)) {
+            this.setPower(speed, direction);
+        }
+//        this.stopMotors();
+    }
+
+    /*
+    Inputs:
+    Angle, direction (left = 0, right = 1), speed
+     */
+    public void pivotToAngle(double angle, double direction, double speed){
+
+        if(direction == 0){
+            this.setPower(speed, 2);
+            if(gyro.getIntegratedZValue() == angle){
+                this.stopMotors();
+            }
+        }
+        else if(direction == 1){
+            this.setPower(speed, 3);
+            if(gyro.getIntegratedZValue() == angle){
+                this.stopMotors();
+            }
+        }
+        else{
+            //do nothing
+        }
+    }
+
+    /*
+    Stops robot
+     */
+    public void stopMotors(){
+        robot.front.setPower(0);
+        robot.back.setPower(0);
+        robot.right.setPower(0);
+        robot.left.setPower(0);
+    }
+}

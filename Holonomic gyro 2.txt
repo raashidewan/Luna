@@ -1,0 +1,127 @@
+package org.firstinspires.ftc.teamcode.fromLuna;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.teamcode.drivetrain;
+
+/**
+ * Created by Raashi Dewan on 7/4/2017.
+ */
+
+@Autonomous(name = "gryo", group = "Sensors")
+@Disabled
+public class gyro2 extends LinearOpMode {
+
+//    drivetrain robot;
+    double heading = 0;
+    double angleZ = 0;
+    public DcMotor left = null;
+    public DcMotor right = null;
+    public DcMotor front = null;
+    public DcMotor back = null;
+    public ModernRoboticsI2cGyro gyro = null;
+
+    public void runOpMode(){
+        //robot = new drivetrain(hardwareMap);
+
+        left = hardwareMap.dcMotor.get("left");
+        right = hardwareMap.dcMotor.get("right");
+        front = hardwareMap.dcMotor.get("front");
+        back = hardwareMap.dcMotor.get("back");
+
+        left.setPower(0);
+        right.setPower(0);
+        front.setPower(0);
+        back.setPower(0);
+
+        left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        left.setDirection(DcMotor.Direction.REVERSE);
+        right.setDirection(DcMotor.Direction.FORWARD);
+        front.setDirection(DcMotor.Direction.FORWARD);
+        back.setDirection(DcMotor.Direction.REVERSE);
+
+        gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
+
+        // start calibrating the gyro.
+        telemetry.addData(">", "Gyro Calibrating. Do Not move!");
+        telemetry.update();
+        gyro.calibrate();
+
+
+        // make sure the gyro is calibrated.
+        while (gyro.isCalibrating())  {
+            //do nothing
+        }
+
+        telemetry.addData(">", "Gyro Calibrated.  Press Start.");
+        telemetry.update();
+
+        waitForStart();
+
+        while(opModeIsActive() && !isStopRequested()){
+            angleZ = -gyro.getIntegratedZValue();
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            //drive straight
+            driveDistance(24, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+
+            //turn 90 degrees left (heading of -90 degrees)
+            pivotToAngle(-90, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            //drive straight
+            driveDistance(24, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            //turn 90 degrees left (heading of -90 degrees)
+            robot.pivotToAngle(-90, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            //drive straight
+            robot.driveDistance(24, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            //turn 90 degrees left (heading of -90 degrees)
+            robot.pivotToAngle(-90, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            //drive straight
+            robot.driveDistance(24, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            //turn 90 degrees left (heading of -90 degrees)
+            robot.pivotToAngle(-90, 0, 0.5);
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+
+            robot.stopMotors();
+        }
+    }
+}

@@ -1,0 +1,141 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+/**
+ * Created by Raashi Dewan on 7/4/2017.
+ */
+
+@Autonomous(name = "gryo 2", group = "Sensors")
+public class gyro_v2 extends LinearOpMode{
+
+    public DcMotor leftMotor;
+    public DcMotor  rightMotor;
+    public ModernRoboticsI2cGyro gyro;
+    int xVal, yVal, zVal = 0;     // Gyro rate Values
+    int heading = 0;
+    // The heading value of the gryo, where all angles are measured from the angle from where it was set to 0
+    int angleZ = 0;
+    boolean lastResetState = false;
+    boolean curResetState  = false;
+    ElapsedTime runtime = new ElapsedTime();
+    double FORWARD_SPEED = 0.75;
+    double BACKWARD_SPEED = -0.5;
+
+    public void runOpMode(){
+        leftMotor = hardwareMap.dcMotor.get("left_drive");
+        rightMotor = hardwareMap.dcMotor.get("right_drive");
+
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
+
+
+        // start calibrating the gyro.
+        telemetry.addData(">", "Gyro Calibrating. Do Not move!");
+        telemetry.update();
+        gyro.calibrate();
+
+
+        // make sure the gyro is calibrated.
+        while (gyro.isCalibrating())  {
+            //do nothing
+        }
+
+        telemetry.addData(">", "Gyro Calibrated.  Press Start.");
+        telemetry.update();
+
+        waitForStart();
+
+        while(opModeIsActive()){
+            angleZ = -gyro.getIntegratedZValue();
+            telemetry.addData("Angle: ", angleZ);
+            telemetry.update();
+
+            //drive straight for 2 seconds
+            leftMotor.setPower(FORWARD_SPEED);
+            rightMotor.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 2.0)) {
+                telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", "Angle: ", angleZ, runtime.seconds());
+                telemetry.update();
+            }
+//            leftMotor.setPower(0.0);
+//            rightMotor.setPower(0.0);
+
+            //turn 90 degrees left (heading of -90 degrees)
+            while(opModeIsActive() && angleZ > -90) {
+                leftMotor.setPower(BACKWARD_SPEED);
+                rightMotor.setPower(FORWARD_SPEED);
+                telemetry.addData("Path", "Leg 2: %2.5f S Elapsed", "Angle: ", angleZ);
+                telemetry.update();
+            }
+            leftMotor.setPower(0.0);
+            rightMotor.setPower(0.0);
+
+            //drive straight for 2 seconds
+            leftMotor.setPower(FORWARD_SPEED);
+            rightMotor.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 2.0)) {
+                telemetry.addData("Path", "Leg 3: %2.5f S Elapsed", "Angle: ", angleZ, runtime.seconds());
+                telemetry.update();
+            }
+//            leftMotor.setPower(0.0);
+//            rightMotor.setPower(0.0);
+
+            //turn 90 degrees left (heading of +-180 degrees)
+            while(opModeIsActive() && angleZ > -180) {
+                leftMotor.setPower(BACKWARD_SPEED);
+                rightMotor.setPower(FORWARD_SPEED);
+                telemetry.addData("Path", "Leg 4: %2.5f S Elapsed", "Angle: ", angleZ);
+                telemetry.update();
+            }
+            leftMotor.setPower(0.0);
+            rightMotor.setPower(0.0);
+
+            //drive straight for 2 seconds
+            leftMotor.setPower(FORWARD_SPEED);
+            rightMotor.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 2.0)) {
+                telemetry.addData("Path", "Leg 5: %2.5f S Elapsed", "Angle: ", angleZ, runtime.seconds());
+                telemetry.update();
+            }
+//            leftMotor.setPower(0.0);
+//            rightMotor.setPower(0.0);
+
+            //turn 90 degrees left (heading of 90 degrees 0r -270)
+            while(opModeIsActive() && angleZ > -270) {
+                leftMotor.setPower(BACKWARD_SPEED);
+                rightMotor.setPower(FORWARD_SPEED);
+                telemetry.addData("Path", "Leg 6: %2.5f S Elapsed", "Angle: ", angleZ);
+                telemetry.update();
+            }
+            leftMotor.setPower(0.0);
+            rightMotor.setPower(0.0);
+
+            //drive straight for 2 seconds
+            leftMotor.setPower(FORWARD_SPEED);
+            rightMotor.setPower(FORWARD_SPEED);
+            runtime.reset();
+            while (opModeIsActive() && (runtime.seconds() < 2.0)) {
+                telemetry.addData("Path", "Leg 7: %2.5f S Elapsed", "Angle: ", angleZ, runtime.seconds());
+                telemetry.update();
+            }
+            leftMotor.setPower(0.0);
+            rightMotor.setPower(0.0);
+        }
+    }
+}

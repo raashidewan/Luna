@@ -1,0 +1,111 @@
+package org.firstinspires.ftc.teamcode.fromLuna;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
+/**
+ * Created by Raashi Dewan on 7/26/2017.
+ */
+
+public class readToFile {
+    private Writer writer;
+    private StringBuffer Buffer;
+    private long msBase;
+    private long nsBase;
+
+    public readToFile(String fileName) {
+        String directoryPath    = "/sdcard/FIRST/DataLogger";
+        String filePath         = directoryPath + "/" + fileName + ".csv";
+
+        new File(directoryPath).mkdir();        // Make sure that the directory exists
+
+        try {
+            writer = new FileWriter(filePath);
+            Buffer = new StringBuffer(128);
+        } catch (IOException e) {
+        }
+        msBase = System.currentTimeMillis();
+        nsBase = System.nanoTime();
+        addField("sec");
+        addField("d ms");
+    }
+
+    private void flushLineBuffer(){
+        long milliTime,nanoTime;
+
+        try {
+            Buffer.append('\n');
+            writer.write(Buffer.toString());
+            Buffer.setLength(0);
+        }
+        catch (IOException e){
+        }
+        milliTime   = System.currentTimeMillis();
+        nanoTime    = System.nanoTime();
+        addField(String.format("%.3f",(milliTime - msBase) / 1.0E3));
+        addField(String.format("%.3f",(nanoTime - nsBase) / 1.0E6));
+        nsBase      = nanoTime;
+    }
+
+    public void closeDataLogger() {
+        try {
+            writer.close();
+        }
+        catch (IOException e) {
+        }
+    }
+
+    public void addField(String s) {
+        if (Buffer.length()>0) {
+            Buffer.append(',');
+        }
+        Buffer.append(s);
+    }
+
+    public void addField(char c) {
+        if (Buffer.length()>0) {
+            Buffer.append(',');
+        }
+        Buffer.append(c);
+    }
+
+    public void addField(boolean b) {
+        addField(b ? '1' : '0');
+    }
+
+    public void addField(byte b) {
+        addField(Byte.toString(b));
+    }
+
+    public void addField(short s) {
+        addField(Short.toString(s));
+    }
+
+    public void addField(long l) {
+        addField(Long.toString(l));
+    }
+
+    public void addField(float f) {
+        addField(Float.toString(f));
+    }
+
+    public void addField(String light, double d) {
+        addField(Double.toString(d));
+    }
+
+    public void addField(double d){
+        addField(Double.toString(d));
+    }
+
+    public void newLine() {
+        flushLineBuffer();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        closeDataLogger();
+        super.finalize();
+    }
+}

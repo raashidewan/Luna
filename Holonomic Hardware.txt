@@ -1,0 +1,70 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsAnalogOpticalDistanceSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+/**
+ * Created by Raashi Dewan on 8/5/2017.
+ */
+
+public class Hardware{
+
+    public DcMotor left = null;
+    public DcMotor right = null;
+    public DcMotor front = null;
+    public DcMotor back = null;
+    public ModernRoboticsAnalogOpticalDistanceSensor ods = null;
+    public ModernRoboticsTouchSensor touch = null;
+    public ModernRoboticsI2cGyro gyro = null;
+
+    public double Speed = 0.5;
+
+    HardwareMap hwMap = null;
+    private ElapsedTime period  = new ElapsedTime();
+
+    public void init(HardwareMap ahwMap) {
+        hwMap = ahwMap;
+
+        //initialize motors
+        left = hwMap.dcMotor.get("left");
+        right = hwMap.dcMotor.get("right");
+        front = hwMap.dcMotor.get("front");
+        back = hwMap.dcMotor.get("back");
+
+        //set motor power to 0
+        left.setPower(0);
+        right.setPower(0);
+        front.setPower(0);
+        back.setPower(0);
+
+        //set motors to run using encoders
+        left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //set motor directions
+        left.setDirection(DcMotor.Direction.REVERSE);
+        right.setDirection(DcMotor.Direction.FORWARD);
+        front.setDirection(DcMotor.Direction.FORWARD);
+        back.setDirection(DcMotor.Direction.REVERSE);
+
+        //initialize sensors
+        ods = (ModernRoboticsAnalogOpticalDistanceSensor)hwMap.opticalDistanceSensor.get("ods");
+        touch = (ModernRoboticsTouchSensor)hwMap.touchSensor.get("touch");
+        gyro = (ModernRoboticsI2cGyro)hwMap.gyroSensor.get("gyro");
+    }
+    public void waitForTick(long periodMs) {
+
+        long  remaining = periodMs - (long)period.milliseconds();
+
+        // Reset the cycle clock for the next pass.
+        period.reset();
+    }
+}
